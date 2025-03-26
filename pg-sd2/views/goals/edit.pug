@@ -1,0 +1,26 @@
+extends ../layout.pug
+
+block content
+  .content
+    h2.mb-4 Edit Goal - #{goal.goal_name}
+
+    form(action=`/goals/edit/${goal.goal_id}`, method="POST", class="mb-4")
+      .mb-3
+        label(for="goal_name") Goal Name:
+        input.form-control(type="text", name="goal_name", value=goal.goal_name, required)
+
+      .mb-3
+        label(for="target_amount") Target Amount (£):
+        input.form-control(type="number", name="target_amount", step="0.01", value=goal.target_amount, required)
+
+      .mb-3
+        label(for="saved_amount") Saved Amount (£):
+        input.form-control(type="number", name="saved_amount", step="0.01", value=goal.saved_amount, required)
+
+      .mb-3
+        label(for="target_date") Target Date:
+        input.form-control(type="date", name="target_date", value=goal.target_date, required)
+        
+
+      button.btn.btn-primary(type="submit") Update Goal
+      a.btn.btn-secondary.ms-2(href="/goals") Cancel

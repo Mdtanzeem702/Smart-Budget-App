@@ -1,28 +1,32 @@
-version: '3.3'
+version: '3'
 services:
-  web:
-    build:
-      context: ./
-    volumes:
-      - .:/src
-    command: supervisor -e  'js,pug,html' index.js
+  app:
+    build: .
     ports:
       - "3000:3000"
     depends_on:
       - db
-  db:
-    image: mysql
-    restart: always
-    env_file:
-      - ./.env
-    ports:
-      - "3308:3306"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306  # Use port 3306 (default MySQL port inside the container)
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_NAME: smartbudget
     volumes:
-      - ./db:/var/lib/mysql
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  db:
+    image: mysql:8.0
     restart: always
-    env_file:
-      - ./.env
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: smartbudget
     ports:
-      - "8081:80"
+      - "3307:3306"  # Map host port 3307 to container port 3306
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql  # Mount init.sql
+
+volumes:
+  db-data:

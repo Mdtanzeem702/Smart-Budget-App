@@ -1,0 +1,56 @@
+extends ../layout
+
+block content
+  h1 Dashboard
+
+  .row
+    .col-md-4
+      .card
+        .card-body
+          h5.card-title Monthly Income
+          h2.text-success £#{monthlyIncome.toFixed(2)}
+    .col-md-4
+      .card
+        .card-body
+          h5.card-title Monthly Expenses
+          h2.text-danger £#{monthlyExpenses.toFixed(2)}
+    .col-md-4
+      .card
+        .card-body
+          h5.card-title Remaining Balance
+          h2.text-primary £#{remainingBalance.toFixed(2)}
+
+  h3.mt-4 Budget Status
+  .row
+    each category in categories
+      .col-md-4.mb-3
+        .card
+          .card-body
+            h5.card-title= category.category_name
+            p.card-text
+              | Spent: £#{category.spent.toFixed(2)}
+              br
+              | Budget: £#{category.budget_limit.toFixed(2)}
+            .progress
+              - const percentage = (category.spent / category.budget_limit) * 100;
+              .progress-bar(class=percentage > 90 ? 'bg-danger' : percentage > 70 ? 'bg-warning' : 'bg-success', style=`width: ${percentage}%`)
+
+  h3.mt-4 Recent Transactions
+  table.table
+    thead
+      tr
+        th Date
+        th Description
+        th Category
+        th Amount
+    tbody
+      each transaction in transactions
+        tr
+          td= new Date(transaction.transaction_date).toLocaleDateString()
+          td= transaction.description
+          td= transaction.category_name
+          td(class=transaction.transaction_type === 'income' ? 'text-success' : 'text-danger')
+            if transaction.transaction_type === 'income'
+              | +£#{transaction.amount.toFixed(2)}
+            else
+              | -£#{transaction.amount.toFixed(2)}

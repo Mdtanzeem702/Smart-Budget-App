@@ -1,0 +1,47 @@
+extends ../layout.pug
+
+block content
+  .content
+    .header.mb-4
+      span.logo SmartBudget
+      .profile
+        span MT
+
+    h2.mb-4 Dashboard
+
+    .row.mb-4
+      .col-md-4
+        .card.p-3.text-center.shadow-sm
+          h5 This Month Income
+          h2.text-success £#{monthlyIncome}
+      .col-md-4
+        .card.p-3.text-center.shadow-sm
+          h5 This Month Expenses
+          h2.text-danger £#{monthlyExpenses}
+      .col-md-4
+        .card.p-3.text-center.shadow-sm
+          h5 Remaining Balance
+          h2.text-primary £#{remainingBalance}
+
+    h4.mb-3 Budget Status
+    .mb-3
+      p Food & Groceries 
+        span.float-end £350/£500
+      .progress.mb-3
+        .progress-bar.bg-danger(style="width: 70%")
+      p Transportation 
+        span.float-end £120/£300
+      .progress.mb-3
+        .progress-bar.bg-success(style="width: 40%")
+      p Entertainment 
+        span.float-end £150/£250
+      .progress.mb-3
+        .progress-bar.bg-warning(style="width: 60%")
+
+    h4.mb-3 Recent Transactions
+    .transactions
+      ul.list-unstyled
+        li Tesco Supermarket 
+          span.expense.float-end -£76.32
+        li Freelance Payment 
+          span.income.float-end +£350.00

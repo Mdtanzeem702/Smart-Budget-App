@@ -1,0 +1,22 @@
+extends ../layout.pug
+
+block content
+  .content
+    h2 Budget List
+    a.btn.btn-primary(href="/budgets/add") Add Budget
+    a.btn.btn-info(href="/budgets/compare") Compare Budgets
+    table.table
+      thead
+        tr
+          th Category
+          th Amount (£)
+          th Month
+          th Actions
+      tbody
+        each budget in budgets
+          tr
+            td #{budget.category_name}
+            td #{budget.amount}
+            td #{budget.month}
+            td
+              a.btn.btn-warning(href=`/budgets/edit/${budget.budget_id}`) Edit

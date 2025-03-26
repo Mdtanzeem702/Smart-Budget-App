@@ -1,0 +1,12 @@
+extends ../layout.pug
+
+block content
+  .content
+    h2 Edit Budget
+    form(action=`/budgets/edit/${budget.budget_id}` method="POST")
+      select.form-select(name="category_id" required)
+        each category in categories
+          option(value=category.category_id, selected=(category.category_id == budget.category_id)) #{category.category_name}
+      input.form-control(type="number" name="amount" value=budget.amount required)
+      input.form-control(type="month" name="month" value=budget.month required)
+      button.btn.btn-primary(type="submit") Update Budget

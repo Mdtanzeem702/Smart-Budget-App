@@ -4,7 +4,7 @@ const mysql = require('mysql2/promise');
 
 const config = {
   db: { /* do not put password or any sensitive info here, done only for demo */
-    host: process.env.DB_CONTAINER,
+    host: process.env.MYSQL_HOST,
     port: process.env.DB_PORT,
     user: process.env.MYSQL_ROOT_USER,
     password: process.env.MYSQL_ROOT_PASSWORD,

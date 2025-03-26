@@ -1,0 +1,21 @@
+extends ../layout.pug
+
+block content
+  .content
+    h2.mb-4 Add New Goal
+
+    form(action="/goals/add", method="POST", class="mb-4")
+      .mb-3
+        label(for="goal_name") Goal Name:
+        input.form-control(type="text", name="goal_name", placeholder="Enter your goal name", required)
+
+      .mb-3
+        label(for="target_amount") Target Amount (£):
+        input.form-control(type="number", name="target_amount", step="0.01", placeholder="Enter the target amount", required)
+
+      .mb-3
+        label(for="target_date") Target Date:
+        input.form-control(type="date", name="target_date", required)
+
+      button.btn.btn-success(type="submit") Add Goal
+      a.btn.btn-secondary.ms-2(href="/goals") Cancel

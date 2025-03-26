@@ -1,0 +1,26 @@
+extends ../layout.pug
+
+block content
+  .content
+    h2 Budget Comparison
+
+    table.table
+      thead
+        tr
+          th Category
+          th Budget Amount (£)
+          th Actual Spending (£)
+          th Month
+          th Status
+      tbody
+        each budget in budgets
+          tr
+            td #{budget.category_name}
+            td #{budget.budget_amount}
+            td #{budget.actual_spending}
+            td #{budget.month}
+            td 
+              if budget.actual_spending > budget.budget_amount
+                span.text-danger Over Budget
+              else
+                span.text-success Within Budget

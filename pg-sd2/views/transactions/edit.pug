@@ -1,0 +1,35 @@
+extends ../layout.pug
+
+block content
+  .content
+    h2.mb-4 Edit Transaction
+
+    form(action=`/transactions/edit/${transaction.transaction_id}`, method="POST", class="p-4 bg-white shadow rounded")
+      .mb-3
+        label(for="description", class="form-label") Description
+        input#description.form-control(type="text", name="description", value=transaction.description, required)
+
+      .mb-3
+        label(for="amount", class="form-label") Amount (£)
+        input#amount.form-control(type="number", name="amount", value=transaction.amount, step="0.01", required)
+
+      .mb-3
+        label(for="category_id", class="form-label") Category
+        select#category_id.form-select(name="category_id", required)
+          option(value="") -- Select Category --
+          each category in categories
+            option(value=category.category_id, selected=(transaction.category_id == category.category_id)) #{category.category_name}
+
+      .mb-3
+        label(for="transaction_type", class="form-label") Transaction Type
+        select#transaction_type.form-select(name="transaction_type", required)
+          option(value="income", selected=(transaction.transaction_type === 'income')) Income
+          option(value="expense", selected=(transaction.transaction_type === 'expense')) Expense
+
+      .mb-3
+        label(for="transaction_date", class="form-label") Transaction Date
+        input#transaction_date.form-control(type="date", name="transaction_date", value=transaction.transaction_date.toISOString().split('T')[0], required)
+
+      .d-flex.justify-content-between.mt-4
+        button.btn.btn-primary(type="submit") Update Transaction
+        a.btn.btn-secondary(href="/transactions") Cancel
