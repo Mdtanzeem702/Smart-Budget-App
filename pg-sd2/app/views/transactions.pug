@@ -1,0 +1,191 @@
+extends layout
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h1
+      i.bi.bi-list-ul.me-2
+      | Transactions
+    button.btn.btn-primary(data-bs-toggle='modal', data-bs-target='#addTransactionModal')
+      i.bi.bi-plus-circle.me-2
+      | Add Transaction
+  
+  .card.shadow-sm.mb-4
+    .card-header.bg-light
+      h5.mb-0 Filter Transactions
+    .card-body
+      form(action='/transactions', method='GET')
+        .row
+          .col-md-4.mb-3
+            label.form-label(for='category_id') Category
+            select#category_id.form-select(name='category_id')
+              option(value='') All Categories
+              each category in categories
+                option(value=category.id, selected=filters.category_id == category.id) #{category.name}
+          
+          .col-md-3.mb-3
+            label.form-label(for='startDate') Start Date
+            input#startDate.form-control(type='date', name='startDate', value=filters.startDate)
+          
+          .col-md-3.mb-3
+            label.form-label(for='endDate') End Date
+            input#endDate.form-control(type='date', name='endDate', value=filters.endDate)
+          
+          .col-md-2.d-flex.align-items-end.mb-3
+            button.btn.btn-primary.w-100(type='submit')
+              i.bi.bi-filter.me-2
+              | Filter
+  
+  .card.shadow-sm
+    .card-header.bg-light
+      h5.mb-0 Transaction List
+    .card-body
+      if transactions && transactions.length > 0
+        .table-responsive
+          table.table.table-hover
+            thead
+              tr
+                th Date
+                th Description
+                th Category
+                th Amount
+                th Actions
+            tbody
+              each transaction in transactions
+                - const isExpense = transaction.amount < 0
+                tr
+                  td= new Date(transaction.date).toLocaleDateString('en-GB')
+                  td= transaction.description
+                  td
+                    span.badge(style=`background-color: ${transaction.color}`) #{transaction.category_name}
+                  td(class=isExpense ? 'text-danger' : 'text-success')
+                    strong #{isExpense ? '-' : ''}£#{Math.abs(transaction.amount).toFixed(2)}
+                  td
+                    button.btn.btn-sm.btn-outline-primary.me-2(data-bs-toggle='modal', data-bs-target='#editTransactionModal', 
+                      data-id=transaction.id,
+                      data-date=transaction.date,
+                      data-description=transaction.description,
+                      data-category=transaction.category_id,
+                      data-amount=Math.abs(transaction.amount))
+                      i.bi.bi-pencil
+                    
+                    button.btn.btn-sm.btn-outline-danger(data-bs-toggle='modal', data-bs-target='#deleteTransactionModal', data-id=transaction.id)
+                      i.bi.bi-trash
+      else
+        p.text-center.text-muted No transactions found.
+
+  // Add Transaction Modal
+  #addTransactionModal.modal.fade(tabindex='-1')
+    .modal-dialog
+      .modal-content
+        .modal-header
+          h5.modal-title Add New Transaction
+          button.btn-close(type='button', data-bs-dismiss='modal')
+        .modal-body
+          form#addTransactionForm(action='/transactions', method='POST')
+            .mb-3
+              label.form-label(for='add-category') Category
+              select#add-category.form-select(name='category_id', required)
+                option(value='') Select Category
+                each category in categories
+                  option(value=category.id) #{category.name}
+            
+            .mb-3
+              label.form-label(for='add-date') Date
+              input#add-date.form-control(type='date', name='date', required, value=new Date().toISOString().split('T')[0])
+            
+            .mb-3
+              label.form-label(for='add-description') Description
+              input#add-description.form-control(type='text', name='description', required)
+            
+            .mb-3
+              label.form-label(for='add-amount') Amount
+              .input-group
+                span.input-group-text £
+                input#add-amount.form-control(type='number', name='amount', step='0.01', min='0', required)
+            
+            .d-grid.gap-2
+              button.btn.btn-primary(type='submit') Save Transaction
+              button.btn.btn-outline-secondary(type='button', data-bs-dismiss='modal') Cancel
+
+  // Edit Transaction Modal
+  #editTransactionModal.modal.fade(tabindex='-1')
+    .modal-dialog
+      .modal-content
+        .modal-header
+          h5.modal-title Edit Transaction
+          button.btn-close(type='button', data-bs-dismiss='modal')
+        .modal-body
+          form#editTransactionForm(action='/transactions/edit/0', method='POST')
+            .mb-3
+              label.form-label(for='edit-category') Category
+              select#edit-category.form-select(name='category_id', required)
+                option(value='') Select Category
+                each category in categories
+                  option(value=category.id) #{category.name}
+            
+            .mb-3
+              label.form-label(for='edit-date') Date
+              input#edit-date.form-control(type='date', name='date', required)
+            
+            .mb-3
+              label.form-label(for='edit-description') Description
+              input#edit-description.form-control(type='text', name='description', required)
+            
+            .mb-3
+              label.form-label(for='edit-amount') Amount
+              .input-group
+                span.input-group-text £
+                input#edit-amount.form-control(type='number', name='amount', step='0.01', min='0', required)
+            
+            .d-grid.gap-2
+              button.btn.btn-primary(type='submit') Update Transaction
+              button.btn.btn-outline-secondary(type='button', data-bs-dismiss='modal') Cancel
+
+  // Delete Transaction Modal
+  #deleteTransactionModal.modal.fade(tabindex='-1')
+    .modal-dialog
+      .modal-content
+        .modal-header
+          h5.modal-title Delete Transaction
+          button.btn-close(type='button', data-bs-dismiss='modal')
+        .modal-body
+          p Are you sure you want to delete this transaction? This action cannot be undone.
+        .modal-footer
+          form#deleteTransactionForm(action='/transactions/delete/0', method='POST')
+            button.btn.btn-outline-secondary(type='button', data-bs-dismiss='modal') Cancel
+            button.btn.btn-danger(type='submit') Delete
+
+block scripts
+  script.
+    // Handle edit transaction modal
+    const editTransactionModal = document.getElementById('editTransactionModal');
+    if (editTransactionModal) {
+      editTransactionModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        const date = button.getAttribute('data-date');
+        const description = button.getAttribute('data-description');
+        const category = button.getAttribute('data-category');
+        const amount = button.getAttribute('data-amount');
+        
+        const form = document.getElementById('editTransactionForm');
+        form.action = `/transactions/edit/${id}`;
+        
+        document.getElementById('edit-date').value = date;
+        document.getElementById('edit-description').value = description;
+        document.getElementById('edit-category').value = category;
+        document.getElementById('edit-amount').value = amount;
+      });
+    }
+    
+    // Handle delete transaction modal
+    const deleteTransactionModal = document.getElementById('deleteTransactionModal');
+    if (deleteTransactionModal) {
+      deleteTransactionModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        
+        const form = document.getElementById('deleteTransactionForm');
+        form.action = `/transactions/delete/${id}`;
+      });
+    }

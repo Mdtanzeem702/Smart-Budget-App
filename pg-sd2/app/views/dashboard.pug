@@ -1,0 +1,82 @@
+extends layout
+
+block content
+  h1.mb-4
+    i.bi.bi-speedometer2.me-2
+    | Dashboard
+  
+  .row.mb-4
+    .col-md-4
+      .card.border-success.h-100
+        .card-body.text-center
+          h5.card-title This Month's Income
+          h2.text-success.mt-3.mb-0 £#{summary.income}
+    
+    .col-md-4
+      .card.border-danger.h-100
+        .card-body.text-center
+          h5.card-title This Month's Expenses
+          h2.text-danger.mt-3.mb-0 £#{summary.expenses}
+    
+    .col-md-4
+      .card.border-primary.h-100
+        .card-body.text-center
+          h5.card-title Remaining Balance
+          h2.text-primary.mt-3.mb-0 £#{summary.remaining}
+  
+  .row.mb-4
+    .col-12
+      .card.shadow-sm
+        .card-header.bg-light
+          h5.mb-0 Budget Status
+        .card-body
+          if categories && categories.length > 0
+            each category in categories
+              - const percentage = category.budget_limit > 0 ? Math.min(100, ((category.spent / category.budget_limit) * 100).toFixed(0)) : 0
+              .mb-3
+                .d-flex.justify-content-between.mb-1
+                  span #{category.name}
+                  span £#{category.spent.toFixed(2)} / £#{category.budget_limit.toFixed(2)}
+                .progress(style='height: 20px;')
+                  - const barClass = percentage > 85 ? 'bg-danger' : percentage > 60 ? 'bg-warning' : 'bg-success'
+                  .progress-bar(class=barClass, role='progressbar', style=`width: ${percentage}%`, aria-valuenow=percentage, aria-valuemin='0', aria-valuemax='100') #{percentage}%
+          else
+            p.text-center.text-muted No budget categories found.
+  
+  .row
+    .col-12
+      .card.shadow-sm
+        .card-header.bg-light.d-flex.justify-content-between.align-items-center
+          h5.mb-0 Recent Transactions
+          a.btn.btn-sm.btn-primary(href='/transactions')
+            i.bi.bi-eye.me-1
+            | View All
+        .card-body
+          if transactions && transactions.length > 0
+            .table-responsive
+              table.table.table-hover
+                thead
+                  tr
+                    th Date
+                    th Description
+                    th Category
+                    th Amount
+                tbody
+                  each transaction in transactions
+                    - const isExpense = transaction.amount < 0
+                    tr
+                      td= new Date(transaction.date).toLocaleDateString('en-GB')
+                      td= transaction.description
+                      td
+                        span.badge(style=`background-color: ${transaction.color}`) #{transaction.category_name}
+                      td(class=isExpense ? 'text-danger' : 'text-success')
+                        strong #{isExpense ? '-' : ''}£#{Math.abs(transaction.amount).toFixed(2)}
+          else
+            p.text-center.text-muted No transactions found.
+
+block scripts
+  script.
+    // Add some animations to the summary cards if needed
+    document.addEventListener('DOMContentLoaded', function() {
+      // Any client-side JS for the dashboard can go here
+    });

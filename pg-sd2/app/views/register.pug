@@ -1,0 +1,36 @@
+extends layout
+
+block content
+  .container
+    .row.justify-content-center.mt-5
+      .col-md-6
+        .card.shadow
+          .card-header.bg-primary.text-white
+            h3.mb-0 Register
+          .card-body
+            form(action='/register', method='POST')
+              .mb-3
+                label.form-label(for='username') Username
+                input#username.form-control(type='text', name='username', placeholder='Enter your username', required)
+              
+              .mb-3
+                label.form-label(for='email') Email
+                input#email.form-control(type='email', name='email', placeholder='Enter your email', required)
+              
+              .mb-3
+                label.form-label(for='password') Password
+                input#password.form-control(type='password', name='password', placeholder='Enter your password', required)
+                small.form-text.text-muted Password must be at least 6 characters
+              
+              .mb-3
+                label.form-label(for='confirm_password') Confirm Password
+                input#confirm_password.form-control(type='password', name='confirm_password', placeholder='Confirm your password', required)
+              
+              .d-grid.gap-2
+                button.btn.btn-primary(type='submit') Register
+            
+            hr
+            
+            .text-center
+              p Already have an account? 
+                a(href='/login') Login

@@ -4,7 +4,7 @@ const mysql = require('mysql2/promise');
 
 const config = {
   db: { /* do not put password or any sensitive info here, done only for demo */
-    host: process.env.MYSQL_HOST,
+    host: process.env.DB_CONTAINER,
     port: process.env.DB_PORT,
     user: process.env.MYSQL_ROOT_USER,
     password: process.env.MYSQL_ROOT_PASSWORD,
@@ -17,13 +17,24 @@ const config = {
   
 const pool = mysql.createPool(config.db);
 
+// Add connection test
+pool.getConnection()
+  .then(connection => {
+    console.log('Database connected successfully');
+    connection.release();
+  })
+  .catch(err => {
+    console.error('Database connection error:', err);
+  });
+
 // Utility function to query the database
 async function query(sql, params) {
   const [rows, fields] = await pool.execute(sql, params);
-
   return rows;
 }
 
+// Export both pool and query
 module.exports = {
   query,
+  pool
 }
