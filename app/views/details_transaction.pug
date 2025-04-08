@@ -1,0 +1,91 @@
+doctype html
+html(lang="en")
+  head
+    title Transaction Details
+    style.
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f9fafb;
+        color: #1e293b;
+        margin: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #334155;
+        margin-bottom: 30px;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+
+      dl {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        row-gap: 12px;
+        column-gap: 10px;
+      }
+
+      dt {
+        font-weight: bold;
+        color: #475569;
+      }
+
+      dd {
+        margin: 0;
+        color: #1e293b;
+      }
+
+      .income {
+        color: #16a34a;
+        font-weight: 600;
+      }
+
+      .expense {
+        color: #dc2626;
+        font-weight: 600;
+      }
+
+      a.back-link {
+        display: inline-block;
+        margin-top: 20px;
+        text-decoration: none;
+        color: #3b82f6;
+        font-weight: 500;
+      }
+
+      a.back-link:hover {
+        text-decoration: underline;
+      }
+
+  body
+    include menu
+
+    h1 Transaction Details
+
+    .container
+      dl
+        dt Transaction ID
+        dd= transaction.transaction_id
+
+        dt User ID
+        dd= transaction.user_id
+
+        dt Category ID
+        dd= transaction.category_id
+
+        dt Date
+        dd= transaction.date
+
+        dt Description
+        dd= transaction.description
+
+        dt Amount
+        dd(class=transaction.amount >= 0 ? 'income' : 'expense')= transaction.amount
+
