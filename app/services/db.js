@@ -17,24 +17,13 @@ const config = {
   
 const pool = mysql.createPool(config.db);
 
-// Add connection test
-pool.getConnection()
-  .then(connection => {
-    console.log('Database connected successfully');
-    connection.release();
-  })
-  .catch(err => {
-    console.error('Database connection error:', err);
-  });
-
 // Utility function to query the database
 async function query(sql, params) {
   const [rows, fields] = await pool.execute(sql, params);
+
   return rows;
 }
 
-// Export both pool and query
 module.exports = {
   query,
-  pool
 }
