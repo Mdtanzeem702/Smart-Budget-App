@@ -1,0 +1,49 @@
+doctype html
+html(lang="en")
+    head
+        title Transactions
+        style.
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+            .income {
+                color: green;
+            }
+            .expense {
+                color: red;
+            }
+    body
+        h1 Transactions
+
+        table
+            thead
+                tr
+                    th Transaction ID
+                    th User ID
+                    th Category ID
+                    th Date
+                    th Description
+                    th Amount
+            tbody
+                each transaction in transactions
+                    tr
+                        td= transaction.transaction_id
+                        td= transaction.user_id
+                        td= transaction.category_id
+                        td= transaction.date
+                        td= transaction.description
+                        td= transaction.amount
