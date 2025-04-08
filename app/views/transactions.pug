@@ -13,13 +13,41 @@ html(lang="en")
       h1 {
         text-align: center;
         color: #334155;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
+      }
+
+      form.search-form {
+        max-width: 800px;
+        margin: 0 auto 20px auto;
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .search-form input, .search-form select {
+        padding: 8px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      .search-form button {
+        background-color: #3b82f6;
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .search-form button:hover {
+        background-color: #2563eb;
       }
 
       table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 20px;
         background-color: #ffffff;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         border-radius: 8px;
@@ -49,17 +77,25 @@ html(lang="en")
       }
 
       .income {
-        color: #16a34a; /* green-600 */
+        color: #16a34a;
         font-weight: 600;
       }
 
       .expense {
-        color: #dc2626; /* red-600 */
+        color: #dc2626;
         font-weight: 600;
       }
+
   body
     include menu
     h1 Transactions
+
+    form.search-form(method="GET", action="/transactions")
+        input(type="text", name="description", placeholder="Search by Description", value=(filters && filters.description) ? filters.description : '')
+        input(type="text", name="user_id", placeholder="User ID", value=(filters && filters.user_id) ? filters.user_id : '')
+        input(type="text", name="category_id", placeholder="Category ID", value=(filters && filters.category_id) ? filters.category_id : '')
+        button(type="submit") Filter
+
 
     table
       thead
@@ -70,6 +106,7 @@ html(lang="en")
           th Date
           th Description
           th Amount
+          th Actions
       tbody
         each transaction in transactions
           tr
@@ -79,3 +116,5 @@ html(lang="en")
             td= transaction.date
             td= transaction.description
             td(class=transaction.amount >= 0 ? 'income' : 'expense')= transaction.amount
+            td
+              a(href=`/transactions/${transaction.transaction_id}`) Details
