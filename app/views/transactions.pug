@@ -1,49 +1,81 @@
 doctype html
 html(lang="en")
-    head
-        title Transactions
-        style.
-            body {
-                font-family: Arial, sans-serif;
-                margin: 20px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }
-            th, td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: left;
-            }
-            th {
-                background-color: #f2f2f2;
-            }
-            .income {
-                color: green;
-            }
-            .expense {
-                color: red;
-            }
-    body
-        h1 Transactions
+  head
+    title Transactions
+    style.
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 20px;
+        background-color: #f9fafb;
+        color: #1e293b;
+      }
 
-        table
-            thead
-                tr
-                    th Transaction ID
-                    th User ID
-                    th Category ID
-                    th Date
-                    th Description
-                    th Amount
-            tbody
-                each transaction in transactions
-                    tr
-                        td= transaction.transaction_id
-                        td= transaction.user_id
-                        td= transaction.category_id
-                        td= transaction.date
-                        td= transaction.description
-                        td= transaction.amount
+      h1 {
+        text-align: center;
+        color: #334155;
+        margin-bottom: 30px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      th, td {
+        padding: 12px 16px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f1f5f9;
+        color: #475569;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        border-bottom: 2px solid #e2e8f0;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f8fafc;
+      }
+
+      tr:hover {
+        background-color: #e2e8f0;
+      }
+
+      .income {
+        color: #16a34a; /* green-600 */
+        font-weight: 600;
+      }
+
+      .expense {
+        color: #dc2626; /* red-600 */
+        font-weight: 600;
+      }
+  body
+    include menu
+    h1 Transactions
+
+    table
+      thead
+        tr
+          th Transaction ID
+          th User ID
+          th Category ID
+          th Date
+          th Description
+          th Amount
+      tbody
+        each transaction in transactions
+          tr
+            td= transaction.transaction_id
+            td= transaction.user_id
+            td= transaction.category_id
+            td= transaction.date
+            td= transaction.description
+            td(class=transaction.amount >= 0 ? 'income' : 'expense')= transaction.amount

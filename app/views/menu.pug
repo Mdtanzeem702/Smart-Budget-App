@@ -1,0 +1,62 @@
+doctype html
+html(lang="en")
+  head
+    title Navbar
+    style.
+      body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f6f8;
+      }
+
+      nav.navbar {
+        background-color: #1e293b; /* Navy blue */
+        padding: 12px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+      .navbar-brand {
+        font-size: 26px;
+        font-weight: bold;
+        color: #facc15; /* Amber */
+        text-decoration: none;
+      }
+
+      .navbar-nav {
+        display: flex;
+        gap: 30px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .nav-item .nav-link {
+        text-decoration: none;
+        color: #cbd5e1; /* Light slate */
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+
+      .nav-item .nav-link:hover {
+        color: #facc15; /* Amber on hover */
+      }
+
+      .nav-item.active .nav-link {
+        color: #facc15;
+        font-weight: bold;
+        border-bottom: 2px solid #facc15;
+        padding-bottom: 3px;
+      }
+  body
+    nav.navbar
+      a.navbar-brand(href='/') SmartBudget
+      ul.navbar-nav
+        li.nav-item(class=(activePage === 'home' ? 'active' : ''))
+          a.nav-link(href='/') Home
+        li.nav-item(class=(activePage === 'transactions' ? 'active' : ''))
+          a.nav-link(href='/transactions') Transactions
+        li.nav-item(class=(activePage === 'about' ? 'active' : ''))
+          a.nav-link(href='/about') About
