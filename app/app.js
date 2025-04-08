@@ -82,17 +82,32 @@ app.get("/hello/:name", function(req, res) {
 // Route to show details of a single transaction by ID
 app.get("/transactions/:id", function(req, res) {
     const transactionId = req.params.id;
-    const sql = 'SELECT * FROM Transactions WHERE transaction_id = ?';
-    db.query(sql, [transactionId]).then(results => {
+  
+    const sql = `
+      SELECT 
+        t.*, 
+        u.email AS user_email, 
+        c.name AS category_name, 
+        c.type AS category_type
+      FROM Transactions t
+      JOIN Users u ON t.user_id = u.user_id
+      LEFT JOIN Categories c ON t.category_id = c.category_id
+      WHERE t.transaction_id = ?
+    `;
+  
+    db.query(sql, [transactionId])
+      .then(results => {
         if (results.length === 0) {
-            return res.status(404).send("Transaction not found");
+          return res.status(404).send("Transaction not found");
         }
         res.render('details_transaction', { transaction: results[0] });
-    }).catch(err => {
+      })
+      .catch(err => {
         console.error(err);
         res.status(500).send("Error retrieving transaction details");
-    });
-});
+      });
+  });
+  
 
 // Start server on port 3000
 app.listen(3000,function(){

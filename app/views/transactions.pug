@@ -92,8 +92,6 @@ html(lang="en")
 
     form.search-form(method="GET", action="/transactions")
         input(type="text", name="description", placeholder="Search by Description", value=(filters && filters.description) ? filters.description : '')
-        input(type="text", name="user_id", placeholder="User ID", value=(filters && filters.user_id) ? filters.user_id : '')
-        input(type="text", name="category_id", placeholder="Category ID", value=(filters && filters.category_id) ? filters.category_id : '')
         button(type="submit") Filter
 
 

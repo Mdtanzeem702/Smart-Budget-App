@@ -71,21 +71,29 @@ html(lang="en")
 
     .container
       dl
-        dt Transaction ID
+        dt Transaction ID:
         dd= transaction.transaction_id
 
-        dt User ID
-        dd= transaction.user_id
 
-        dt Category ID
+        dt User Email:
+        dd= transaction.user_email
+
+        dt Category ID:
         dd= transaction.category_id
 
-        dt Date
+        dt Category Name:
+        dd= transaction.category_name || 'N/A'
+
+        dt Category Type:
+        dd= transaction.category_type || 'N/A'
+
+        dt Date:
         dd= transaction.date
 
-        dt Description
+        dt Description:
         dd= transaction.description
 
-        dt Amount
+        dt Amount:
         dd(class=transaction.amount >= 0 ? 'income' : 'expense')= transaction.amount
 
+      a.back-link(href='/transactions') ← Back to Transactions
