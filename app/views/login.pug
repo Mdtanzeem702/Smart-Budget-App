@@ -1,0 +1,17 @@
+//- views/login.pug
+extends layout
+
+block content
+  .form-container
+    h1 Login
+    form(method="POST", action="/authenticate")
+      .form-group
+        label(for="email") Email
+        input#email(type="email", name="email", required)
+      .form-group
+        label(for="password") Password
+        input#password(type="password", name="password", required)
+      button(type="submit") Login
+    p
+      | Don't have an account?
+      a(href="/register") Sign up

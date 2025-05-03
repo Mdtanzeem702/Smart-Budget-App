@@ -1,0 +1,17 @@
+//- views/signup.pug
+extends layout
+
+block content
+  .form-container
+    h1 Sign Up
+    form(method="POST", action="/set-password")
+      .form-group
+        label(for="email") Email
+        input#email(type="email", name="email", required)
+      .form-group
+        label(for="password") Password
+        input#password(type="password", name="password", required)
+      button(type="submit") Sign Up
+    p
+      | Already have an account?
+      a(href="/login") Login
