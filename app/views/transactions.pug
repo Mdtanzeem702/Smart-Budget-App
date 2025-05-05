@@ -1,104 +1,136 @@
-doctype html
-html(lang="en")
-  head
-    title Transactions
+extends layout
+
+block content
+  //– This wrapper makes all your page content one flex item
+  .content-wrapper
     style.
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin: 20px;
-        background-color: #f9fafb;
+      /* constrain width and center */
+      .content-wrapper {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      /* page title */
+      .transactions-header {
+        text-align: left;
+        margin: 2rem 0 1rem;
+      }
+      .transactions-header h1 {
+        font-size: 2rem;
         color: #1e293b;
       }
 
-      h1 {
-        text-align: center;
-        color: #334155;
-        margin-bottom: 20px;
-      }
-
-      form.search-form {
-        max-width: 800px;
-        margin: 0 auto 20px auto;
+      /* filter + add button row */
+      .actions-top {
         display: flex;
-        gap: 12px;
-        justify-content: center;
         flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 1.5rem;
       }
-
-      .search-form input, .search-form select {
+      .actions-top input[type="text"] {
+        flex: 1 1 250px;
         padding: 8px 12px;
-        border: 1px solid #cbd5e1;
-        border-radius: 4px;
-        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
       }
-
-      .search-form button {
-        background-color: #3b82f6;
-        color: #fff;
-        border: none;
+      .actions-top button {
+        background-color: #1e293b;
+        color: #facc15;
         padding: 8px 16px;
-        border-radius: 4px;
+        border: none;
+        border-radius: 6px;
         cursor: pointer;
+        font-weight: 500;
+      }
+      .actions-top button:hover {
+        background-color: #334155;
+      }
+      .actions-top a {
+        background-color: #22c55e;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .actions-top a:hover {
+        background-color: #16a34a;
       }
 
-      .search-form button:hover {
-        background-color: #2563eb;
-      }
-
+      /* table styling */
       table {
         width: 100%;
         border-collapse: collapse;
-        background-color: #ffffff;
+        background-color: #fff;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         border-radius: 8px;
         overflow: hidden;
       }
-
       th, td {
         padding: 12px 16px;
         text-align: left;
       }
-
       th {
         background-color: #f1f5f9;
         color: #475569;
         font-size: 14px;
         text-transform: uppercase;
-        letter-spacing: 0.03em;
         border-bottom: 2px solid #e2e8f0;
       }
-
       tr:nth-child(even) {
         background-color: #f8fafc;
       }
-
       tr:hover {
         background-color: #e2e8f0;
       }
-
       .income {
         color: #16a34a;
         font-weight: 600;
       }
-
       .expense {
         color: #dc2626;
         font-weight: 600;
       }
+      /* action buttons in table */
+      .action-buttons a,
+      .action-buttons form {
+        display: inline-block;
+        margin-right: 8px;
+      }
+      .action-buttons a {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .action-buttons a:hover {
+        text-decoration: underline;
+      }
+      .action-buttons button {
+        background: none;
+        border: none;
+        color: #dc2626;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: underline;
+      }
 
-  body
-    include layout
-    h1 Transactions
+    //– Page title
+    .transactions-header
+      h1 Transactions
 
-    form.search-form(method="GET", action="/transactions")
+    //– Filter + Add button row
+    .actions-top
+      form(method="GET", action="/transactions")
         input(type="text", name="description", placeholder="Search by Description", value=(filters && filters.description) ? filters.description : '')
         button(type="submit") Filter
+      a(href="/transactions/new") + Add Transaction
 
-
+    //– Transactions table
     table
       thead
         tr
-          th Transaction ID
+          th ID
           th User ID
           th Category ID
           th Date
@@ -106,13 +138,20 @@ html(lang="en")
           th Amount
           th Actions
       tbody
-        each transaction in transactions
+        if transactions.length === 0
           tr
-            td= transaction.transaction_id
-            td= transaction.user_id
-            td= transaction.category_id
-            td= transaction.date
-            td= transaction.description
-            td(class=transaction.amount >= 0 ? 'income' : 'expense')= transaction.amount
-            td
-              a(href=`/transactions/${transaction.transaction_id}`) Details
+            td(colspan="7", style="text-align:center") No transactions found.
+        else
+          each tx in transactions
+            tr
+              td= tx.transaction_id
+              td= tx.user_id
+              td= tx.category_id
+              td= tx.date.toISOString().split('T')[0]
+              td= tx.description
+              td(class=(parseFloat(tx.amount) >= 0 ? 'income' : 'expense'))= tx.amount
+              td.action-buttons
+                a(href=`/transactions/${tx.transaction_id}`) View
+                a(href=`/transactions/${tx.transaction_id}/edit`) Edit
+                form(method="POST", action=`/transactions/${tx.transaction_id}/delete`, onsubmit="return confirm('Are you sure?');")
+                  button(type="submit") Delete

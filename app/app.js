@@ -162,17 +162,23 @@ app.get("/transactions", async (req, res) => {
   let sql = "SELECT * FROM Transactions WHERE user_id = ?";
   const params = [req.session.uid];
 
-  if (description) {
+  if (description && description.trim() !== "") {
     sql += " AND description LIKE ?";
     params.push(`%${description}%`);
   }
-  if (category_id) {
+
+  if (category_id && !isNaN(category_id)) {
     sql += " AND category_id = ?";
     params.push(category_id);
   }
 
+  console.log("Running SQL:", sql);
+  console.log("With Params:", params);
+
   try {
     const results = await db.query(sql, params);
+    console.log("Results:", results); // ✅ Log actual data returned
+
     res.render("transactions", {
       pageTitle: "Transactions",
       activePage: "transactions",
