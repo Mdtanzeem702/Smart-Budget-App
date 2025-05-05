@@ -139,6 +139,7 @@ html(lang="en")
           margin: 0 1rem;
         }
       }
+
   body
     nav.navbar
       a.navbar-brand(href='/') SmartBudget
@@ -147,6 +148,10 @@ html(lang="en")
           a.nav-link(href='/') Home
         li.nav-item(class=(activePage === 'transactions' ? 'active' : ''))
           a.nav-link(href='/transactions') Transactions
+        li.nav-item(class=(activePage === 'profile' ? 'active' : ''))
+          a.nav-link(href='/profile') Profile
+        li.nav-item
+          a.nav-link(href='/logout') Logout
 
     .container
       block content

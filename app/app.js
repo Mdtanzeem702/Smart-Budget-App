@@ -6,6 +6,7 @@ const session = require("express-session");
 const { User } = require("./models/user");
 const db = require("./services/db");
 
+const bcrypt = require("bcryptjs");
 const app = express();
 
 // Body parsers
@@ -386,11 +387,11 @@ app.post('/profile', ensureLoggedIn, async (req, res) => {
 
 // ---------- PASSWORD CHANGE ---------- //
 
-// Render password-change page
+// Render password‐change page
 app.get('/profile/password', ensureLoggedIn, (req, res) => {
   res.render('change_password', {
     pageTitle: 'Change Password',
-    activePage: null
+    activePage: 'profile'
   });
 });
 
@@ -402,19 +403,23 @@ app.post('/profile/password', ensureLoggedIn, async (req, res) => {
   }
 
   try {
-    // verify current
-    const user = new User();  
-    user.id = req.session.uid;  
-    // load hashed pw
+    // load the stored hash
     const [{ password: hash }] = await db.query(
       'SELECT password FROM Users WHERE user_id = ?',
       [req.session.uid]
     );
-    const match = await bcrypt.compare(currentPassword, hash);
-    if (!match) return res.status(401).send('Current password is incorrect.');
 
-    // update to new
+    // compare
+    const match = await bcrypt.compare(currentPassword, hash);
+    if (!match) {
+      return res.status(401).send('Current password is incorrect.');
+    }
+
+    // update to the new one
+    const user = new User(); 
+    user.id = req.session.uid;
     await user.setUserPassword(newPassword);
+
     res.redirect('/profile');
   } catch (err) {
     console.error('Error changing password:', err);

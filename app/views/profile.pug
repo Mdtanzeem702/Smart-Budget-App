@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  style.
+    .profile-form {
+      max-width: 500px;
+      margin: 2rem auto;
+    }
+    .profile-form .form-group + .form-group {
+      margin-top: 1rem;
+    }
+    .profile-form button {
+      margin-top: 1.5rem;
+    }
+
+  .profile-form
+    h1 My Profile
+    form(method="POST", action="/profile")
+      .form-group
+        label(for="username") Username
+        input#username(type="text", name="username", required, value=user.username)
+      .form-group
+        label(for="email") Email
+        input#email(type="email", name="email", required, value=user.email)
+      button(type="submit") Save Changes
+
+    p(style="margin-top:1rem;")
+      a(href="/profile/password") Change Password
