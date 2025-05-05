@@ -1,7 +1,6 @@
 extends layout
 
 block content
-  //– This wrapper makes all your page content one flex item
   .content-wrapper
     style.
       /* constrain width and center */
@@ -10,8 +9,6 @@ block content
         max-width: 1200px;
         margin: 0 auto;
       }
-
-      /* page title */
       .transactions-header {
         text-align: left;
         margin: 2rem 0 1rem;
@@ -20,8 +17,6 @@ block content
         font-size: 2rem;
         color: #1e293b;
       }
-
-      /* filter + add button row */
       .actions-top {
         display: flex;
         flex-wrap: wrap;
@@ -57,8 +52,6 @@ block content
       .actions-top a:hover {
         background-color: #16a34a;
       }
-
-      /* table styling */
       table {
         width: 100%;
         border-collapse: collapse;
@@ -92,7 +85,6 @@ block content
         color: #dc2626;
         font-weight: 600;
       }
-      /* action buttons in table */
       .action-buttons a,
       .action-buttons form {
         display: inline-block;
@@ -131,25 +123,28 @@ block content
       thead
         tr
           th ID
-          th User ID
-          th Category ID
           th Date
+          th Category
           th Description
           th Amount
           th Actions
       tbody
         if transactions.length === 0
           tr
-            td(colspan="7", style="text-align:center") No transactions found.
+            td(colspan="6", style="text-align:center") No transactions found.
         else
           each tx in transactions
             tr
               td= tx.transaction_id
-              td= tx.user_id
-              td= tx.category_id
               td= tx.date.toISOString().split('T')[0]
+              //- show category name + type badge
+              td
+                = tx.category_name || 'Uncategorized'
+                if tx.category_type
+                  span(style=`margin-left:8px; padding:2px 6px; font-size:12px; background:${tx.category_type==='income'? '#d1fae5':'#fee2e2'}; border-radius:4px; color:${tx.category_type==='income'? '#065f46':'#991b1b'};`)
+                    | #{tx.category_type}
               td= tx.description
-              td(class=(parseFloat(tx.amount) >= 0 ? 'income' : 'expense'))= tx.amount
+              td(class=(parseFloat(tx.amount) >= 0 ? 'income' : 'expense'))= parseFloat(tx.amount).toFixed(2)
               td.action-buttons
                 a(href=`/transactions/${tx.transaction_id}`) View
                 a(href=`/transactions/${tx.transaction_id}/edit`) Edit
