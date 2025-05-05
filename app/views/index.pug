@@ -1,2 +1,82 @@
-include layout
-h1 Smart budget
+extends layout
+
+block content
+  style.
+    .dashboard {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem auto;
+      max-width: 960px;
+    }
+
+    .card {
+      background-color: #ffffff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      color: #1e293b;
+    }
+
+    .card p {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #334155;
+    }
+
+    .card.income p {
+      color: #16a34a;
+    }
+
+    .card.expense p {
+      color: #dc2626;
+    }
+
+    @media (max-width: 480px) {
+      .cards {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+
+  .dashboard
+    h1 Welcome to SmartBudget!
+
+    //- Row 1: Income and Expense Summary
+    .cards
+      .card.income
+        h2 Total Income
+        p £#{totalIncome}
+
+      .card.expense
+        h2 Total Expenses
+        p £#{totalExpense}
+
+    //- Row 2: Time-based Spending
+    .cards
+      .card.expense
+        h2 Today's Spending
+        p £#{todayExpense}
+
+      .card.expense
+        h2 This Week's Spending
+        p £#{weekExpense}
+
+      .card.expense
+        h2 This Month's Spending
+        p £#{monthExpense}
+
+      .card.expense
+        h2 This Year's Spending
+        p £#{yearExpense}
