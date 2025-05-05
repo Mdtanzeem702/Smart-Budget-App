@@ -116,7 +116,7 @@ block content
       form(method="GET", action="/transactions")
         input(type="text", name="description", placeholder="Search by Description", value=(filters && filters.description) ? filters.description : '')
         button(type="submit") Filter
-      a(href="/transactions/new") + Add Transaction
+      a(href="/transactions_create") + Add Transaction
 
     //– Transactions table
     table

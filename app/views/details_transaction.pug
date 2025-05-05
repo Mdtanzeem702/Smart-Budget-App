@@ -1,99 +1,115 @@
-doctype html
-html(lang="en")
-  head
-    title Transaction Details
-    style.
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f9fafb;
-        color: #1e293b;
-        margin: 20px;
-      }
+extends layout
 
-      h1 {
-        text-align: center;
-        color: #334155;
-        margin-bottom: 30px;
-      }
+block content
+  style.
+    /* Container styling */
+    .details-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    /* Definition list layout */
+    .details-container dl {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      row-gap: 12px;
+      column-gap: 16px;
+    }
+    .details-container dt {
+      font-weight: bold;
+      color: #475569;
+      padding-right: 8px;
+    }
+    .details-container dd {
+      margin: 0;
+      color: #1e293b;
+    }
+    /* Amount coloring */
+    .income {
+      color: #16a34a;
+      font-weight: 600;
+    }
+    .expense {
+      color: #dc2626;
+      font-weight: 600;
+    }
+    /* Category badge */
+    .badge {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 6px;
+      font-size: 12px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      color: #475569;
+    }
+    .badge.income {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .badge.expense {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    /* Action buttons */
+    .detail-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .button {
+      display: inline-block;
+      padding: 8px 12px;
+      text-decoration: none;
+      background: #1e293b;
+      color: #facc15;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .button:hover {
+      background: #334155;
+    }
+    .button.delete {
+      background: none;
+      color: #dc2626;
+      text-decoration: underline;
+      padding: 0;
+    }
+    .button.delete:hover {
+      color: #b91c1c;
+    }
 
-      .container {
-        max-width: 600px;
-        margin: 0 auto;
-        background-color: #fff;
-        padding: 24px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      }
-
-      dl {
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-        row-gap: 12px;
-        column-gap: 10px;
-      }
-
-      dt {
-        font-weight: bold;
-        color: #475569;
-      }
-
-      dd {
-        margin: 0;
-        color: #1e293b;
-      }
-
-      .income {
-        color: #16a34a;
-        font-weight: 600;
-      }
-
-      .expense {
-        color: #dc2626;
-        font-weight: 600;
-      }
-
-      a.back-link {
-        display: inline-block;
-        margin-top: 20px;
-        text-decoration: none;
-        color: #3b82f6;
-        font-weight: 500;
-      }
-
-      a.back-link:hover {
-        text-decoration: underline;
-      }
-
-  body
-    include layout
-
+  .details-container
     h1 Transaction Details
+    dl
+      dt Transaction ID:
+      dd= transaction.transaction_id
 
-    .container
-      dl
-        dt Transaction ID:
-        dd= transaction.transaction_id
+      dt User Email:
+      dd= transaction.user_email
 
+      dt Category:
+      dd
+        = transaction.category_name || 'Uncategorized'
+        if transaction.category_type
+          span.badge(class=transaction.category_type)= transaction.category_type
 
-        dt User Email:
-        dd= transaction.user_email
+      dt Date:
+      dd= transaction.date.toISOString().split('T')[0]
 
-        dt Category ID:
-        dd= transaction.category_id
+      dt Description:
+      dd= transaction.description
 
-        dt Category Name:
-        dd= transaction.category_name || 'N/A'
+      dt Amount:
+      dd(class=(parseFloat(transaction.amount) >= 0 ? 'income' : 'expense'))= parseFloat(transaction.amount).toFixed(2)
 
-        dt Category Type:
-        dd= transaction.category_type || 'N/A'
-
-        dt Date:
-        dd= transaction.date
-
-        dt Description:
-        dd= transaction.description
-
-        dt Amount:
-        dd(class=transaction.amount >= 0 ? 'income' : 'expense')= transaction.amount
-
-      a.back-link(href='/transactions') ← Back to Transactions
+    .detail-actions
+      a.button(href=`/transactions/${transaction.transaction_id}/edit`) Edit
+      form(method="POST", action=`/transactions/${transaction.transaction_id}/delete`, onsubmit="return confirm('Are you sure?');")
+        button.button.delete(type="submit") Delete
+      a.button(href="/transactions") ← Back

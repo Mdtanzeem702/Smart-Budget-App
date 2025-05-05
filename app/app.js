@@ -217,21 +217,21 @@ const ensureAuth = (req, res, next) => {
   next();
 };
 
-// GET all
-app.get("/api/transactions", ensureAuth, async (req, res) => {
-  try {
-    const txs = await db.query("SELECT * FROM Transactions WHERE user_id = ?", [
-      req.session.uid,
-    ]);
-    res.json(txs);
-  } catch (err) {
-    console.error("API list error:", err);
-    res.status(500).json({ error: "Database error" });
-  }
-});
+// // GET all
+// app.get("/transactions", ensureAuth, async (req, res) => {
+//   try {
+//     const txs = await db.query("SELECT * FROM Transactions WHERE user_id = ?", [
+//       req.session.uid,
+//     ]);
+//     res.json(txs);
+//   } catch (err) {
+//     console.error("API list error:", err);
+//     res.status(500).json({ error: "Database error" });
+//   }
+// });
 
 // POST create
-app.post("/api/transactions", ensureAuth, async (req, res) => {
+app.post("/transactions", ensureAuth, async (req, res) => {
   const { category_id, date, description, amount } = req.body;
   if (!category_id || !date || !description || amount == null) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -253,64 +253,88 @@ app.post("/api/transactions", ensureAuth, async (req, res) => {
   }
 });
 
-// GET one
-app.get("/api/transactions/:id", ensureAuth, async (req, res) => {
+// Make sure user is logged in
+function ensureLoggedIn(req, res, next) {
+  if (!req.session.uid) return res.redirect('/login');
+  next();
+}
+
+// ——— Render “New Transaction” form ———
+app.get('/transactions_create', ensureLoggedIn, async (req, res) => {
+  res.render('transaction_form', {
+    pageTitle: 'New Transaction',
+    action: '/transactions/new',
+    transaction: {}
+  });
+});
+
+// ——— Handle “Create Transaction” ———
+app.post('/transactions/new', ensureLoggedIn, async (req, res) => {
+  const { category_id, date, description, amount } = req.body;
   try {
-    const [tx] = await db.query(
-      "SELECT * FROM Transactions WHERE transaction_id = ? AND user_id = ?",
-      [req.params.id, req.session.uid]
+    await db.query(
+      `INSERT INTO Transactions (user_id, category_id, date, description, amount)
+       VALUES (?, ?, ?, ?, ?)`,
+      [req.session.uid, category_id, date, description, amount]
     );
-    if (!tx) return res.status(404).json({ error: "Not found" });
-    res.json(tx);
+    res.redirect('/transactions');
   } catch (err) {
-    console.error("API get-one error:", err);
-    res.status(500).json({ error: "Database error" });
+    console.error('Error creating transaction:', err);
+    res.status(500).send('Error creating transaction');
   }
 });
 
-// PUT update
-app.put("/api/transactions/:id", ensureAuth, async (req, res) => {
-  const { category_id, date, description, amount } = req.body;
-  if (!category_id || !date || !description || amount == null) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
+// ——— Render “Edit Transaction” form ———
+app.get('/transactions/:id/edit', ensureLoggedIn, async (req, res) => {
   try {
-    const result = await db.query(
-      `UPDATE Transactions 
+    const [tx] = await db.query(
+      'SELECT * FROM Transactions WHERE transaction_id = ? AND user_id = ?',
+      [req.params.id, req.session.uid]
+    );
+    if (!tx) return res.status(404).send('Transaction not found');
+    res.render('transaction_form', {
+      pageTitle: 'Edit Transaction',
+      action: `/transactions/${tx.transaction_id}/edit`,
+      transaction: tx
+    });
+  } catch (err) {
+    console.error('Error loading transaction:', err);
+    res.status(500).send('Error loading transaction');
+  }
+});
+
+
+// ——— Handle “Update Transaction” ———
+app.post('/transactions/:id/edit', ensureLoggedIn, async (req, res) => {
+  const { category_id, date, description, amount } = req.body;
+  try {
+    await db.query(
+      `UPDATE Transactions
        SET category_id = ?, date = ?, description = ?, amount = ?
        WHERE transaction_id = ? AND user_id = ?`,
       [category_id, date, description, amount, req.params.id, req.session.uid]
     );
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Not found or not yours" });
-    }
-    const [updatedTx] = await db.query(
-      "SELECT * FROM Transactions WHERE transaction_id = ?",
-      [req.params.id]
-    );
-    res.json(updatedTx);
+    res.redirect('/transactions');
   } catch (err) {
-    console.error("API update error:", err);
-    res.status(500).json({ error: "Database error" });
+    console.error('Error updating transaction:', err);
+    res.status(500).send('Error updating transaction');
   }
 });
 
-// DELETE
-app.delete("/api/transactions/:id", ensureAuth, async (req, res) => {
+// ——— Handle “Delete Transaction” ———
+app.post('/transactions/:id/delete', ensureLoggedIn, async (req, res) => {
   try {
-    const result = await db.query(
-      "DELETE FROM Transactions WHERE transaction_id = ? AND user_id = ?",
+    await db.query(
+      'DELETE FROM Transactions WHERE transaction_id = ? AND user_id = ?',
       [req.params.id, req.session.uid]
     );
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Not found or not yours" });
-    }
-    res.json({ success: true });
+    res.redirect('/transactions');
   } catch (err) {
-    console.error("API delete error:", err);
-    res.status(500).json({ error: "Database error" });
+    console.error('Error deleting transaction:', err);
+    res.status(500).send('Error deleting transaction');
   }
 });
+
 
 // ---------- Start Server ---------- //
 const PORT = 3000;
