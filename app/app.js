@@ -336,6 +336,93 @@ app.post('/transactions/:id/delete', ensureLoggedIn, async (req, res) => {
 });
 
 
+// Render profile page
+app.get('/profile', ensureLoggedIn, async (req, res) => {
+  try {
+    const [user] = await db.query(
+      'SELECT user_id, username, email FROM Users WHERE user_id = ?',
+      [req.session.uid]
+    );
+    if (!user) return res.redirect('/login');
+
+    res.render('profile', {
+      pageTitle: 'My Profile',
+      activePage: null,
+      user
+    });
+  } catch (err) {
+    console.error('Error loading profile:', err);
+    res.status(500).send('Error loading profile');
+  }
+});
+
+// Handle profile update
+app.post('/profile', ensureLoggedIn, async (req, res) => {
+  const { username, email } = req.body;
+  if (!username || !email) {
+    return res.status(400).send('Username and email cannot be blank.');
+  }
+
+  try {
+    // ensure no other user uses this email/username
+    const conflict = await db.query(
+      'SELECT user_id FROM Users WHERE (username = ? OR email = ?) AND user_id != ?',
+      [username, email, req.session.uid]
+    );
+    if (conflict.length) {
+      return res.status(400).send('Username or email already taken.');
+    }
+
+    await db.query(
+      'UPDATE Users SET username = ?, email = ? WHERE user_id = ?',
+      [username, email, req.session.uid]
+    );
+    res.redirect('/profile');
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    res.status(500).send('Error updating profile');
+  }
+});
+
+// ---------- PASSWORD CHANGE ---------- //
+
+// Render password-change page
+app.get('/profile/password', ensureLoggedIn, (req, res) => {
+  res.render('change_password', {
+    pageTitle: 'Change Password',
+    activePage: null
+  });
+});
+
+// Handle password change
+app.post('/profile/password', ensureLoggedIn, async (req, res) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+  if (!currentPassword || !newPassword || newPassword !== confirmPassword) {
+    return res.status(400).send('Please check your passwords and try again.');
+  }
+
+  try {
+    // verify current
+    const user = new User();  
+    user.id = req.session.uid;  
+    // load hashed pw
+    const [{ password: hash }] = await db.query(
+      'SELECT password FROM Users WHERE user_id = ?',
+      [req.session.uid]
+    );
+    const match = await bcrypt.compare(currentPassword, hash);
+    if (!match) return res.status(401).send('Current password is incorrect.');
+
+    // update to new
+    await user.setUserPassword(newPassword);
+    res.redirect('/profile');
+  } catch (err) {
+    console.error('Error changing password:', err);
+    res.status(500).send('Error changing password');
+  }
+});
+
+
 // ---------- Start Server ---------- //
 const PORT = 3000;
 app.listen(PORT, () => {
