@@ -53,19 +53,25 @@ app.get("/register", (req, res) => {
 
 // Handle new user signup or existing user password set
 app.post("/set-password", async (req, res) => {
-  const { email, password } = req.body;
-  const user = new User(email);
+  const { email, username, password } = req.body;
+
+  if (!email || !username || !password) {
+    return res.status(400).send("Username, email, and password are required.");
+  }
+
+  const user = new User(email, username);
 
   try {
     const uId = await user.getIdFromEmail();
 
     if (uId) {
       // Existing user: update password
+      user.id = uId;
       await user.setUserPassword(password);
       res.send("Password updated successfully.");
     } else {
       // New user: create account
-      await user.addUser(email);
+      await user.addUser(password);
       res.send("Account created! Please log in.");
     }
   } catch (err) {
@@ -73,6 +79,7 @@ app.post("/set-password", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
 
 // Handle login form submission
 app.post("/authenticate", async (req, res) => {
